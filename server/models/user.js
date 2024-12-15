@@ -26,6 +26,10 @@ var userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        match: [
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Biểu thức regex kiểm tra email
+            'Please fill a valid email address', // Thông báo lỗi nếu không khớp regex
+        ]
     },
     mobile: {
         type: String,
@@ -59,4 +63,9 @@ userSchema.pre('save', async function () {
     this.password = await hashPassword(this.password);
 
 })
+
+// Ta có thể định nghĩa thêm hàm ở đây ==> khi mà ta dùng toán tử find, findOne thì trả về instace, instance đó có các phương thức ở đây
+userSchema.method = {
+
+}
 module.exports = mongoose.model('User', userSchema);
