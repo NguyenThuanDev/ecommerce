@@ -2,7 +2,7 @@ const User = require('../models/user');
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 const { createAccessToken, createRefreshToken } = require("../middlewares/jwt");
-
+const jwt = require("jsonwebtoken");
 const comparePassWord = (password, hasspassword) => {
     return new Promise((resolve, reject) => {
         try {
@@ -88,6 +88,7 @@ const login = asyncHandler(async (req, res) => {
             const { _id, password, createdAt, updatedAt, role, ...rest } = user.toObject();
             const token = await createAccessToken(_id, role);
             const refeshToken = await createRefreshToken(_id);
+            await User.findByIdAndUpdate(_id, { refreshToken: refeshToken }, { new: true })
             res.cookie("refeshToken", refeshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
             return res.status(200).json({
                 errorCode: 0,
@@ -104,4 +105,54 @@ const login = asyncHandler(async (req, res) => {
 
 
 })
-module.exports = { register, getAllUser, getCurrentUser, login }
+//Viết hàm RefeshAccessToken, khi token bị hết hạn thì client sẽ gọi hàm này để lấy dũ liệu RefeshToken từ cookie và xin cấp mới token
+const RefeshAccessToken = asyncHandler(async (req, res) => {
+    const cookie = req.cookies;
+    if (!cookie || !cookie?.refeshToken) {
+        return res.status(200).json({
+            success: false,
+            message: "Không có refresh Token ở Cookie, vui lòng đăng nhập lại"
+        })
+    }
+
+    const decode = await jwt.verify(cookie?.refeshToken, process.env.SECRET_KEY);
+    const user = await User.findOne({ _id: decode["_id"], refreshToken: cookie?.refeshToken });
+    const newToken = await createAccessToken(user["_id"], user['role']);
+    return res.status(200).json({
+        success: true,
+        newAccessToken: newToken
+    })
+
+
+
+
+});
+
+
+
+// Viết hàm Logout
+const logout = asyncHandler(async (req, res) => {
+    const cookie = req.cookies;
+    if (!cookie || !cookie?.refeshToken) {
+        return res.status(200).json({
+            success: true,
+            message: "Người dùng chưa đăng nhập"
+        })
+    }
+
+    const decode = await jwt.verify(cookie['refeshToken'], process.env.SECRET_KEY);
+    console.log(decode)
+    await User.findByIdAndUpdate(decode["_id"], {
+        refreshToken: ""
+    }, { new: true })
+    res.clearCookie("refeshToken", { httpOnly: true, secure: true });
+    res.status(200).json({
+        success: true,
+        message: "Logout thành công"
+    })
+
+
+})
+
+
+module.exports = { register, getAllUser, getCurrentUser, login, RefeshAccessToken, logout }
