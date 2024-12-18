@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'); // Erase if already required
-
+const crypto = require("crypto")
 // Declare the Schema of the Mongo model
 const bcrypt = require('bcrypt');
 const hashPassword = (password) => {
@@ -56,7 +56,7 @@ var userSchema = new mongoose.Schema({
     },
     refreshToken: { type: String },
     resetPasswordToken: { type: String },
-    resetPasswordExpire: { type: Date },
+    resetPasswordExpire: { type: String },
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {
@@ -65,7 +65,12 @@ userSchema.pre('save', async function () {
 })
 
 // Ta có thể định nghĩa thêm hàm ở đây ==> khi mà ta dùng toán tử find, findOne thì trả về instace, instance đó có các phương thức ở đây
-userSchema.method = {
-
+userSchema.methods = {
+    createTokenChangePass: function () {
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        this.resetPasswordExpire = Date.now() + 5 * 60 * 1000;
+        return resetToken;
+    }
 }
 module.exports = mongoose.model('User', userSchema);

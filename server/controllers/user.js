@@ -3,6 +3,8 @@ const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 const { createAccessToken, createRefreshToken } = require("../middlewares/jwt");
 const jwt = require("jsonwebtoken");
+const sendMail = require("../utils/sendmail")
+const crypto = require("crypto")
 const comparePassWord = (password, hasspassword) => {
     return new Promise((resolve, reject) => {
         try {
@@ -52,6 +54,8 @@ const getAllUser = asyncHandler(async (req, res) => {
 
 });
 const getCurrentUser = asyncHandler(async (req, res) => {
+
+
     const allUser = await User.findById(req?.user["_id"]).select("-password -_id")
     return res.status(200).json({
         errorCode: 0,
@@ -154,5 +158,43 @@ const logout = asyncHandler(async (req, res) => {
 
 })
 
+//Đầu tiên tạo hàm để resetPassword=> Gọi hàm nếu hợp lệ thì tạo ở DB resetToken và gửi token đó về cho người dùng
+const forgetPassword = asyncHandler(async (req, res) => {
+    const { email } = req.query;
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new Error(`Không tìm thấy user có email ${email}`)
+    }
+    const token = user.createTokenChangePass();
+    await user.save();
+    sendMail(user, token);
+    res.status(200).json({
+        success: true,
+        token: token
+    })
 
-module.exports = { register, getAllUser, getCurrentUser, login, RefeshAccessToken, logout }
+
+});
+const verifyChangeToken = asyncHandler(async (req, res) => {
+    const { token, newpassword } = req.body;
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({ resetPasswordToken: resetPasswordToken, resetPasswordExpire: { $gt: Date.now() } });
+    if (!user) {
+        throw new Error("Token không hợp lệ hoặc đã quá thời hạn");
+    }
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    user.refreshToken = undefined;
+    user.password = newpassword;
+    user.save();
+    res.status(200).json({
+        success: true,
+        message: "Đã đổi thông tin thành công"
+    })
+
+
+
+
+
+});
+module.exports = { register, getAllUser, getCurrentUser, login, RefeshAccessToken, logout, forgetPassword, verifyChangeToken }
