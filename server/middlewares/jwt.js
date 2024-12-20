@@ -26,4 +26,7 @@ const createRefreshToken = (_id) => {
     })
 
 }
-module.exports = { createAccessToken, createRefreshToken };
+module.exports = {
+    createAccessToken,
+    createRefreshToken
+};

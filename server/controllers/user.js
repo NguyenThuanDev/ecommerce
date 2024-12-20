@@ -186,6 +186,7 @@ const verifyChangeToken = asyncHandler(async (req, res) => {
     user.resetPasswordExpire = undefined;
     user.refreshToken = undefined;
     user.password = newpassword;
+    user.passwordChangeAt = new Date()
     user.save();
     res.status(200).json({
         success: true,
@@ -197,4 +198,33 @@ const verifyChangeToken = asyncHandler(async (req, res) => {
 
 
 });
-module.exports = { register, getAllUser, getCurrentUser, login, RefeshAccessToken, logout, forgetPassword, verifyChangeToken }
+const updateCurrentUser = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    if (!_id || Object.keys(req.body).length == 0) {
+        throw new Error("Missing input!!");
+    }
+    const userData = await User.findByIdAndUpdate(_id, req.body, { new: true }).select("-password -__v -passwordChangeAt -refreshToken");
+    res.status(200).json({
+        success: userData ? true : false,
+        dataChanged: userData
+    })
+
+
+
+})
+
+const updateUserbyAdmin = asyncHandler(async (req, res) => {
+
+})
+module.exports =
+{
+    register,
+    getAllUser,
+    getCurrentUser,
+    login,
+    RefeshAccessToken,
+    logout,
+    forgetPassword,
+    verifyChangeToken,
+    updateCurrentUser
+}
