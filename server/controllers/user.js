@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt')
 const { createAccessToken, createRefreshToken } = require("../middlewares/jwt");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendmail")
-const crypto = require("crypto")
+const crypto = require("crypto");
+const { request } = require('http');
 const comparePassWord = (password, hasspassword) => {
     return new Promise((resolve, reject) => {
         try {
@@ -214,8 +215,31 @@ const updateCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const updateUserbyAdmin = asyncHandler(async (req, res) => {
+    const { _id } = req.params;
+    if (Object.keys(req.body).length == 0) {
+        return res.status(200).json({
+            success: false,
+            message: "Missing payload"
+        })
+    }
+    const dataChange = await User.findByIdAndUpdate(_id, req.body, { new: true }).select("-password -passwordChangeAt -refreshToken -role");
+    return res.status(200).json({
+        success: dataChange ? true : false,
+        dataChange
+    })
 
 })
+
+const deleteUser = asyncHandler(async (req, res) => {
+    const { _id } = req.params;
+    const userDeleted = await User.findByIdAndDelete(_id).select("-password");
+    res.status(200).json({
+        success: userDeleted ? true : false,
+        userDeleted
+    })
+
+
+});
 module.exports =
 {
     register,
@@ -226,5 +250,7 @@ module.exports =
     logout,
     forgetPassword,
     verifyChangeToken,
-    updateCurrentUser
+    updateCurrentUser,
+    updateUserbyAdmin,
+    deleteUser
 }

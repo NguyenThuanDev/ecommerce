@@ -1,5 +1,16 @@
 const express = require('express');
-const { register, getAllUser, getCurrentUser, login, RefeshAccessToken, logout, forgetPassword, verifyChangeToken, updateCurrentUser } = require('../controllers/user');
+const {
+    register,
+    getAllUser,
+    getCurrentUser,
+    login,
+    RefeshAccessToken,
+    logout,
+    forgetPassword,
+    verifyChangeToken,
+    updateCurrentUser,
+    updateUserbyAdmin,
+    deleteUser } = require('../controllers/user');
 
 const { verifyToken, isAdmin } = require("../middlewares/verifyToken")
 const router = express.Router();
@@ -12,4 +23,6 @@ router.get("/logout", logout);
 router.get("/forget-password", forgetPassword);
 router.post("/change-password", verifyChangeToken);
 router.put("/current-info", verifyToken, updateCurrentUser)
+router.put("/change-info/:_id", verifyToken, isAdmin, updateUserbyAdmin)
+router.delete("/:_id", verifyToken, isAdmin, deleteUser)
 module.exports = router;
