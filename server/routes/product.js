@@ -6,7 +6,10 @@ const {
     getProduct,
     getProducts,
     updateProduct,
-    deleteProduct, importfile } = require("../controllers/product")
+    deleteProduct,
+    importfile,
+    ratingProduct
+} = require("../controllers/product")
 const path = require("path")
 const slugify = require('slugify');
 const storage = multer.diskStorage({
@@ -34,6 +37,7 @@ router.post("/", verifyToken, isAdmin, createProduct)
 router.get("/", getProducts)
 router.get("/:_id", getProduct)
 router.post("/:_id", verifyToken, isAdmin, updateProduct);
+router.put("/rating/:product_id", verifyToken, ratingProduct)
 router.delete("/:_id", verifyToken, isAdmin, deleteProduct)
 
 module.exports = router

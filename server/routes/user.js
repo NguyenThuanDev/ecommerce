@@ -24,5 +24,5 @@ router.get("/forget-password", forgetPassword);
 router.post("/change-password", verifyChangeToken);
 router.put("/current-info", verifyToken, updateCurrentUser)
 router.put("/change-info/:_id", verifyToken, isAdmin, updateUserbyAdmin)
-router.delete("/:_id", verifyToken, isAdmin, deleteUser)
+router.delete("/:product_id", verifyToken, isAdmin, deleteUser)
 module.exports = router;
