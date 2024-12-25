@@ -25,7 +25,25 @@ const getCategory = asyncHandler(async (req, res) => {
 })
 
 const getCategories = asyncHandler(async (req, res) => {
-    const { sort, page, limit, ...filter } = req.body;
+    let { sort = "name", page, limit, name } = req.query;
+    const query = ProductCategory.find({ name: { $regex: new RegExp(name, 'i') } });
+
+    if (!limit) {
+        limit = await ProductCategory.find({ name: { $regex: new RegExp(name, 'i') } }).countDocuments;
+    }
+    if (!page) {
+        page = 1;
+    }
+    const offset = (page - 1) * limit;
+    query.sort(sort);
+    query.skip(offset);
+    query.limit(limit)
+    const productCategory = await query.exec();
+    res.status(200).json({
+        length: productCategory.length,
+        productCategory
+    })
+
 
 
 });
