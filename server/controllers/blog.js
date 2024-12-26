@@ -108,7 +108,56 @@ const getBlogs = asyncHandler(async (req, res) => {
 const addLike = asyncHandler(async (req, res) => {
     const { _id: userId } = req.user;
     const { _id } = req.params;
-    const data = await Blog.findById(_id);
+    const blog = await Blog.findById(_id);
+    let like = blog["liked"];
+    let dislike = blog["disliked"]
+    //Có like thì bỏ like; 
+    if (like.indexOf(userId) == -1) {
+
+        if (dislike.indexOf(userId) != 1) {
+            like.push(userId);
+            dislike.splice(dislike.indexOf(userId), 1)
+        }
+        else {
+            like.push(userId);
+        }
+
+    }
+    else {
+        like.splice(like.indexOf(userId), 1)
+    }
+
+    await blog.save()
+    res.status(200).json({ blog })
+
+
+
+})
+
+const adddisLike = asyncHandler(async (req, res) => {
+    const { _id: userId } = req.user;
+    const { _id } = req.params;
+    const blog = await Blog.findById(_id);
+    let like = blog["liked"];
+    let dislike = blog["disliked"]
+    //Có like thì bỏ like; 
+    if (dislike.indexOf(userId) == -1) {
+
+        if (like.indexOf(userId) != 1) {
+            dislike.push(userId);
+            like.splice(like.indexOf(userId), 1)
+        }
+        else {
+            dislike.push(userId);
+        }
+
+    }
+    else {
+        dislike.splice(dislike.indexOf(userId), 1)
+    }
+
+    await blog.save()
+    res.status(200).json({ blog })
 
 
 
@@ -122,6 +171,8 @@ module.exports = {
     deleteBlog,
     getBlogbyId,
     getBlogbyId,
-    getBlogs
+    getBlogs,
+    addLike,
+    adddisLike
 
 }
