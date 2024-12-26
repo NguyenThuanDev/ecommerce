@@ -41,10 +41,14 @@ const deleteBlog = asyncHandler(async (req, res) => {
 
 
 });
-
+//Mỗi lần getBlog thì phải show rõ ai là người thích, dislike => populate với bảng user đế lấy dữ liệu, đồng thời tăng lượt view lên
 const getBlogbyId = asyncHandler(async (req, res) => {
     const { _id } = req.params;
-    const reponse = await Blog.findById(_id);
+    const seletedFieldPopulate = "firstname lastname"
+    const reponse = await Blog.findByIdAndUpdate(_id,
+        { $inc: { totalView: 1 } }, { new: true })
+        .populate("liked", seletedFieldPopulate)
+        .populate("disliked", seletedFieldPopulate);
     res.status(200).json({
         success: response ? true : false,
         reponse

@@ -35,6 +35,10 @@ var blogSchema = new mongoose.Schema({
     author: {
         type: String,
         default: "Admin"
+    },
+    totalView: {
+        type: Number,
+        default: 0
     }
 
 }, {
