@@ -1,5 +1,6 @@
 const ProductCategory = require("../models/productCategory");
 const asyncHandler = require("express-async-handler");
+
 const createCategory = asyncHandler(async (req, res) => {
     const { name } = req.body;
     if (!name) {

@@ -13,11 +13,15 @@ const verifyToken = async (req, res, next) => {
                 message: "Unvalid token"
             })
         }
-        req.user = { _id: decode["_id"] }
+        else {
+            req.user = { _id: decode["_id"] }
+            next()
+        }
+
     })
 
 
-    next()
+
 
 }
 const isAdmin = expressAsyncHandler(async (req, res, next) => {

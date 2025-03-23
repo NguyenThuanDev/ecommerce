@@ -38,19 +38,29 @@ var userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: [true, "Password is required"],
+        minLength: [5, "Password must be 5 charaters or more"],
     },
     role: {
         type: String,
-        default: "user"
+        enum: {
+            values: ['user', 'admin'],
+            message: '{VALUE} is not supported'
+        },
+        default: 'user'
     },
-    cart: {
-        type: Array,
-        default: []
-    },
-    address: {
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }]
-    },
+    cart: [{
+        product: { type: mongoose.Schema.ObjectId, ref: "Product" },
+        quantity: {
+            type: Number
+        },
+        variant: {
+            type: String
+        }
+    }],
+    address: [
+        { type: String }
+    ],
     wishlist: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }]
     },
@@ -59,7 +69,13 @@ var userSchema = new mongoose.Schema({
     resetPasswordExpire: { type: Date },
     passwordChangeAt: {
         type: String
-    }
+    },
+    orders: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "Order"
+        }
+    ]
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

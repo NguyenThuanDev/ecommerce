@@ -8,37 +8,29 @@ const {
     updateProduct,
     deleteProduct,
     importfile,
-    ratingProduct
+    ratingProduct,
+    setProductCategorybyCondition,
+    uploadImages,
+    importJson,
+    getStat
 } = require("../controllers/product")
-const path = require("path")
-const slugify = require('slugify');
-const storage = multer.diskStorage({
-    // Nơi lưu file
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    // Đặt lại tên file
-    filename: (req, file, cb) => {
-        const filename = slugify(file.originalname.split(".")[0], {
-            replacement: '-',
-            lower: true,
-            strict: true,
-            locale: 'vi',
-            trim: true
-        })
-        cb(null, `${filename}${path.extname(file.originalname)}`);
-    },
-});
+const storage = require("../configs/upload.config")
+const cloudStorage = require("../configs/cloudinary.config");
 
 const upload = multer({ storage });
+const uploadCloudinary = multer({ storage: cloudStorage })
 const router = express.Router();
-router.post("/import", upload.single("file"), importfile)
+router.post("/import", upload.single("file"), importfile);
+router.post("/imports", upload.single("file"), importJson);
+router.post("/upload/:_id", verifyToken, isAdmin, uploadCloudinary.array("image"), uploadImages)
 router.post("/", verifyToken, isAdmin, createProduct)
 router.get("/", getProducts)
 router.get("/:_id", getProduct)
 router.post("/:_id", verifyToken, isAdmin, updateProduct);
 router.put("/rating/:product_id", verifyToken, ratingProduct)
 router.delete("/:_id", verifyToken, isAdmin, deleteProduct)
+router.put("/setTag/", verifyToken, isAdmin, setProductCategorybyCondition)
+router.get('/get/stats', getStat)
 
 module.exports = router
 

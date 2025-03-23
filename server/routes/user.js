@@ -10,7 +10,9 @@ const {
     verifyChangeToken,
     updateCurrentUser,
     updateUserbyAdmin,
-    deleteUser } = require('../controllers/user');
+    deleteUser,
+    updateAddress,
+    addtoCart } = require('../controllers/user');
 
 const { verifyToken, isAdmin } = require("../middlewares/verifyToken")
 const router = express.Router();
@@ -23,6 +25,8 @@ router.get("/logout", logout);
 router.get("/forget-password", forgetPassword);
 router.post("/change-password", verifyChangeToken);
 router.put("/current-info", verifyToken, updateCurrentUser)
+router.put("/update-address", verifyToken, updateAddress)
 router.put("/change-info/:_id", verifyToken, isAdmin, updateUserbyAdmin)
 router.delete("/:product_id", verifyToken, isAdmin, deleteUser)
+router.put("/add-to-cart", verifyToken, addtoCart)
 module.exports = router;

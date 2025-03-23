@@ -81,7 +81,7 @@ const getBlogs = asyncHandler(async (req, res) => {
         sort = sort.split(",").join(" ");
     }
     if (!fields) {
-        fields = "-_id -createdAt -updatedAt -__v -id"
+        fields = "-createdAt -updatedAt -__v -id"
     }
     else {
         fields = fields.split(",").join(" ");
@@ -167,6 +167,21 @@ const adddisLike = asyncHandler(async (req, res) => {
 
 })
 
+const uploadImageBlog = asyncHandler(async (req, res) => {
+    const { _id } = req.params;
+    if (!req.file) {
+        throw new Error("Please to Image to upload")
+    }
+    const response = await Blog.findByIdAndUpdate(_id, { images: req.file.path }, { new: true });
+    res.status(200).json({
+        success: response ? true : false,
+        response
+    })
+
+
+
+})
+
 
 
 module.exports = {
@@ -177,6 +192,7 @@ module.exports = {
     getBlogbyId,
     getBlogs,
     addLike,
-    adddisLike
+    adddisLike,
+    uploadImageBlog
 
 }

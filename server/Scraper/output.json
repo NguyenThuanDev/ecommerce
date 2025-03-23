@@ -1,0 +1,34 @@
+[
+    {
+        "name": "Smartphone",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/smartphone"
+    },
+    {
+        "name": "Tablet",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/tablet"
+    },
+    {
+        "name": "Laptop",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/laptop"
+    },
+    {
+        "name": "Camera",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/camera"
+    },
+    {
+        "name": "Printer",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/printer"
+    },
+    {
+        "name": "Speaker",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/speaker"
+    },
+    {
+        "name": "Accessories",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/accessories"
+    },
+    {
+        "name": "Television",
+        "linkurl": "https://digital-world-2.myshopify.com/collections/television"
+    }
+]

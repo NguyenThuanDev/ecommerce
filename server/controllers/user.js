@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendmail")
 const crypto = require("crypto");
 const { request } = require('http');
+const { default: mongoose } = require('mongoose');
 const comparePassWord = (password, hasspassword) => {
     return new Promise((resolve, reject) => {
         try {
@@ -240,6 +241,64 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 
 });
+//cho phép người dùng update địa chỉ của mình
+const updateAddress = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { address } = req.body;
+    if (!address) {
+        throw new Error("Missing payload");
+    }
+    const response = await User.findByIdAndUpdate(_id, { $push: { address: address } }, { new: true });
+    res.status(200).json({
+        success: response ? true : false,
+        response
+
+    })
+
+
+});
+
+
+const addtoCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { product, quantity, variant } = req.body;
+    if (!product || !quantity || !variant) {
+        throw new Error("Missing payload");
+    }
+    const alreadyExisting = await User.findOne({ _id, cart: { $elemMatch: { product, variant } } })
+    if (alreadyExisting) {
+        const response = await User.findOneAndUpdate({
+            _id,
+            "cart.product": product,
+            "cart.variant": variant
+        }, {
+            $inc: {
+                "cart.$.quantity": quantity
+            }
+        }, { new: true })
+        res.status(200).json(
+            response
+
+        )
+    }
+    else {
+        const response = await User.findByIdAndUpdate(_id, { $push: { cart: { product, quantity, variant } } }, { new: true })
+            .populate({
+                path: 'cart.product',
+                select: 'title price'
+            }).select("firstname lastname cart");
+        res.status(200).json({
+            success: response ? true : false,
+            response
+        })
+    }
+
+
+
+
+})
+
+
 module.exports =
 {
     register,
@@ -252,5 +311,8 @@ module.exports =
     verifyChangeToken,
     updateCurrentUser,
     updateUserbyAdmin,
-    deleteUser
+    deleteUser,
+    updateAddress,
+    addtoCart,
+
 }
