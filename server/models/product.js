@@ -1,5 +1,7 @@
 const mongoose = require('mongoose'); // Erase if already required
 const fs = require('fs');
+const slugify = require("slugify")
+
 // Declare the Schema of the Mongo model
 var productSchema = new mongoose.Schema({
     title: {
@@ -85,6 +87,16 @@ productSchema.virtual("priceInUSD").get(function () {
 
 })
 //"save" chỉ áp dụng cho các phương thức như create, hoặc save(); 
+productSchema.pre("save", function () {
+    this.slug = slugify(this.title, {
+        replacement: '-',
+        lower: true,
+        strict: false,
+        locale: 'vi',
+        trim: true
+    })
+
+})
 productSchema.post("save", async function (doc, next) {
     try {
         await doc.populate("createBy", "email")

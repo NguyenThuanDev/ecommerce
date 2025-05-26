@@ -68,13 +68,12 @@ const getProducts = asyncHandler(async (req, res) => {
         sort = sort.split(",").join(" ");
     }
     if (!field) {
-        field = "title products brand price images totalRatings"
+        field = "title products slug brand price images totalRatings description"
     }
     else {
         field = field.split(",").join(" ")
     }
     const offset = (page - 1) * limit
-    console.log(sort)
     query.sort(sort)
     query.select(field)
     if (page && limit) {
@@ -100,9 +99,10 @@ const updateProduct = asyncHandler(async (req, res) => {
         req.body.slug = slugify(req.body.title, {
             replacement: '-',
             lower: true,
-            strict: false,
+            strict: true,
             locale: 'vi',
-            trim: true
+            trim: true,
+            remove: /["']/g
         })
     }
     const productUpdated = await Product.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true },)
@@ -289,7 +289,7 @@ const importJson = asyncHandler(async (req, res) => {
             description: item['description'],
             price: item['price'].replace(/\.|VNĐ|VND/g, '').replace(',', '.'),
             brand: item['title'].split(" ")[0],
-            // slug: slugify(item['title'])
+            slug: slugify(item['title']),
             images: item['images'],
             totalRatings: Math.round(Math.random() * 5)
 

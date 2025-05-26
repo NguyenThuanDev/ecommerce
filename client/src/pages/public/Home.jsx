@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sidebar, Banner, BestSeller, Deals } from '../../components/index';
-import FeatureProduct from '../../components/FeatureProduct'
+import FeatureProduct from '../../components/FeatureProduct';
+import NewArrival from '../../components/NewArrival';
 const Home = () => {
     return (
         <div>
@@ -22,8 +23,15 @@ const Home = () => {
                 <div>
                     <FeatureProduct />
                 </div>
+                <div className='w-main border-b-2 border-b-red-400 h-[600px]'>
+                    <h3 className='font-semibold text-[20px] py-[15px]'>{`New Arrivals`.toUpperCase()}</h3>
+                    <div>
+                        <NewArrival />
+                    </div>
+                </div>
 
             </div>
+
 
         </div>);
 };

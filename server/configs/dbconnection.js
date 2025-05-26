@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+
 const connectDB = async () => {
-    const mongoURI = 'mongodb://localhost:27017/ecommerce';
+    const mongoURI = process.env.CONNECT_STRING;
     try {
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,       // Đảm bảo tương thích với chuỗi kết nối
@@ -14,5 +15,7 @@ const connectDB = async () => {
 
 }
 
-module.exports = connectDB 
+
+
+module.exports = connectDB
 

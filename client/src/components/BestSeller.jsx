@@ -62,8 +62,9 @@ const BestSeller = () => {
 
                     {isActive === 1 ? bestSelling.map(item => {
                         return (
-
+                            
                             <Product productData={item} key={item.id} hasHover={true} isBorder={true} />
+
 
                         )
                     }) : isActive === 2 ? newArrival.map(item => {

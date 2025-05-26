@@ -6,7 +6,8 @@ const path = {
     PRODUCT: 'products',
     BLOG: 'blogs',
     SERVICE: 'services',
-    FAQ: 'faqs'
+    FAQ: 'faqs',
+    PRODUCT_DETAIL: 'product/:pid/:slug'
 
 }
 export default path;
